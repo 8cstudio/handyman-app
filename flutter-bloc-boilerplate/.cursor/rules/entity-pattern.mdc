@@ -1,0 +1,21 @@
+---
+description: Entity and model class patterns
+globs: "**/entities/**/*.dart"
+alwaysApply: false
+---
+
+# Entity Pattern
+
+- Immutable — all fields `final`, prefer `const` constructor
+- Include `fromJson`, `toJson`, `copyWith`
+- Use Equatable for value comparison
+- Use nullable types for optional fields
+- Handle type casting explicitly in `fromJson`
+
+## Response Wrapper
+
+Use `ApiResponse<T>` in `domain/entities/common/` for API wrappers.
+
+## Navigation Args
+
+Pass screen arguments via constructor, not `ModalRoute.settings.arguments`.

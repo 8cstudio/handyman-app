@@ -1,0 +1,1 @@
+why we have 2 .env and example env

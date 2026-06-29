@@ -1,0 +1,16 @@
+---
+description: No hardcoding rule
+alwaysApply: true
+---
+
+# No Hardcoding
+
+Never hardcode values that might change.
+
+Use `.env`, `FlavorConfig`, or remote config for:
+- API base URLs
+- Timeouts
+- Feature flags
+- Secrets
+
+See `.env.example` for required variables.

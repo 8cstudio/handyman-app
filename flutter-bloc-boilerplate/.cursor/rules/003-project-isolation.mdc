@@ -1,0 +1,14 @@
+---
+description: Project scoping rules
+alwaysApply: true
+---
+
+# Project Isolation
+
+Single Flutter app — not a monorepo.
+
+Owned directories: `lib/`, `test/`, `assets/`, platform folders.
+
+When committing, only stage files relevant to the current task.
+
+Respect Clean Architecture import boundaries.

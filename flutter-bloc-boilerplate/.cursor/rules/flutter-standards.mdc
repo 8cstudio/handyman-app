@@ -1,0 +1,14 @@
+---
+description: Flutter project standards
+globs: "lib/**/*.dart"
+alwaysApply: false
+---
+
+# Flutter Standards
+
+- Use `final` and `const` where possible
+- Trailing commas on multi-line calls
+- Resolve dependencies via `getIt<T>()`
+- Register in appropriate DI module (network, repository, domain, presentation)
+- Handle errors with typed `ApiException`
+- Import order: dart, flutter, packages, project

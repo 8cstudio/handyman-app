@@ -1,0 +1,23 @@
+---
+description: Screen widget structure
+globs: "**/*_screen.dart"
+alwaysApply: false
+---
+
+# Screen Pattern
+
+- Register routes in `presentation/routes/app_routes.dart` and a route module
+- Navigate via `context.goAppRoute(AppRoute.someRoute)` — never hardcode path strings
+- Pass args via constructor
+- Extract `_buildAppBar()`, `_buildBody()`, `_buildContent()`
+- Handle loading/error/success with `BlocBuilder` + `BlocListener`
+- Dispatch events: `context.read<AuthBloc>().add(SomeEvent())`
+
+```dart
+BlocListener<MyBloc, MyState>(
+  listener: (context, state) { /* side effects */ },
+  child: BlocBuilder<MyBloc, MyState>(
+    builder: (context, state) => _buildBody(state),
+  ),
+)
+```

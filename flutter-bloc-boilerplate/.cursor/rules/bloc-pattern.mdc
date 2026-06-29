@@ -1,0 +1,31 @@
+---
+description: BLoC and Cubit conventions
+globs: "**/blocs/**/*.dart"
+alwaysApply: false
+---
+
+# BLoC Pattern
+
+## BLoC vs Cubit
+
+- **BLoC**: complex flows (auth, sockets, multi-step forms, paginated lists)
+- **Cubit**: simple UI state (toggles, tab index, form visibility)
+
+## File Structure
+
+```
+presentation/blocs/{feature}/
+├── {feature}_bloc.dart
+├── {feature}_event.dart
+└── {feature}_state.dart
+```
+
+## Rules
+
+- States and events are immutable — use Equatable
+- No business logic in widgets — only in BLoC/Cubit/UseCase
+- Side effects (navigation, snackbars): `BlocListener`
+- UI rebuilds: `BlocBuilder` or `BlocSelector`
+- Register BLoCs in `presentation/di/presentation_layer_injection.dart`
+- App-level BLoCs via `MultiBlocProvider` in `main.dart`
+- Feature BLoCs via `BlocProvider` at route/screen level when needed

@@ -1,0 +1,39 @@
+---
+description: Clean Architecture layer boundaries and conventions
+globs: "lib/**/*.dart"
+alwaysApply: false
+---
+
+# Clean Architecture
+
+## Layer Structure
+
+```
+lib/
+├── data/           # APIs, local storage, repository implementations
+├── domain/         # entities, params, repository interfaces, use cases
+├── presentation/   # blocs, screens, common widgets, routes
+├── core/           # dio, config, utils, use case base
+├── constants/      # colors, theme, text, network constants
+└── di/             # GetIt service locator
+```
+
+## Import Rules
+
+- `domain/` MUST NOT import from `data/` or `presentation/`
+- `data/` may import `domain/` and `core/` only
+- `presentation/` may import `domain/` and `core/` only — never `data/` directly
+- `core/` and `constants/` are shared by all layers
+
+## Feature Creation Order
+
+1. Entity in `domain/entities/`
+2. Params in `domain/params/`
+3. Repository interface in `domain/repository_interfaces/`
+4. API interface + impl in `data/data_sources/remote/apis/`
+5. Repository impl in `data/repository/`
+6. Use case(s) in `domain/usecases/`
+7. BLoC in `presentation/blocs/`
+8. Screen in `presentation/screens/`
+9. Register DI in all three layer modules
+10. Add route to `presentation/routes/app_routes.dart` and the matching route module

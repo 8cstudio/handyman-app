@@ -1,0 +1,25 @@
+---
+description: API implementation patterns
+globs: "**/*_api*.dart"
+alwaysApply: false
+---
+
+# API Pattern
+
+## Structure
+
+- Abstract interface: `auth_api.dart`
+- Implementation: `auth_api_impl.dart`
+- Endpoints in `data/data_sources/remote/constants/network_constants.dart`
+- Map `DioException` → `ApiException`
+- Return domain entities, not raw maps
+
+## Registration
+
+Register in `data/di/module/network_module/network_module.dart`:
+
+```dart
+getIt.registerLazySingleton<AuthApi>(
+  () => AuthApiImpl(getIt<DioClient>()),
+);
+```
