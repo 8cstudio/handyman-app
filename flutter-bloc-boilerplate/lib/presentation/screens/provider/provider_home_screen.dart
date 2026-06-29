@@ -8,7 +8,8 @@ import 'package:my_bloc_app/presentation/blocs/handyman/handyman_cubit.dart';
 import 'package:my_bloc_app/presentation/screens/provider/provider_shell.dart';
 
 class ProviderHomeScreen extends StatelessWidget {
-  const ProviderHomeScreen({super.key});
+  final int initialTabIndex;
+  const ProviderHomeScreen({super.key, this.initialTabIndex = 0});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +18,7 @@ class ProviderHomeScreen extends StatelessWidget {
         ..loadBookings()
         ..loadChatPreviews()
         ..startRealtimeSync(),
-      child: const ProviderShell(),
+      child: ProviderShell(initialIndex: initialTabIndex),
     );
   }
 }

@@ -76,4 +76,11 @@ abstract class HandymanApi {
   });
 
   Future<String?> getProviderId();
+
+  Future<void> registerDeviceToken({
+    required String token,
+    required String platform,
+  });
+
+  Future<void> unregisterDeviceToken(String token);
 }

@@ -10,7 +10,8 @@ import 'package:my_bloc_app/presentation/widgets/glass/glass_app_bar.dart';
 import 'package:my_bloc_app/presentation/widgets/glass/glass_shell.dart';
 
 class CustomerHomeScreen extends StatelessWidget {
-  const CustomerHomeScreen({super.key});
+  final int initialTabIndex;
+  const CustomerHomeScreen({super.key, this.initialTabIndex = 0});
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +20,7 @@ class CustomerHomeScreen extends StatelessWidget {
         ..loadHomeFeed()
         ..loadChatPreviews()
         ..startRealtimeSync(),
-      child: const CustomerShell(initialIndex: 0),
+      child: CustomerShell(initialIndex: initialTabIndex),
     );
   }
 }

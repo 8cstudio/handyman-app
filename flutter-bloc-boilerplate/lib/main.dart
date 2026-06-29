@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:my_bloc_app/constants/app_theme.dart';
 import 'package:my_bloc_app/core/config/api_base_url.dart';
 import 'package:my_bloc_app/core/config/flavors/flavors.dart';
+import 'package:my_bloc_app/core/firebase/push_notification_service.dart';
 import 'package:my_bloc_app/core/supabase/supabase_service.dart';
 import 'package:my_bloc_app/di/service_locator.dart';
 import 'package:my_bloc_app/presentation/blocs/auth/auth_bloc.dart';
@@ -55,6 +56,7 @@ Future<void> main() async {
     await SupabaseService.initialize();
   }
   await ServiceLocator.configureDependencies();
+  await PushNotificationService.instance.initialize();
   await getIt<ThemeConfigCubit>().loadThemeConfig();
   Bloc.observer = AppBlocObserver();
   final authBloc = getIt<AuthBloc>();

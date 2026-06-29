@@ -10,14 +10,15 @@ import 'package:my_bloc_app/presentation/widgets/glass/glass_bottom_bar.dart';
 import 'package:my_bloc_app/presentation/widgets/glass/glass_shell.dart';
 
 class ProviderShell extends StatefulWidget {
-  const ProviderShell({super.key});
+  final int initialIndex;
+  const ProviderShell({super.key, this.initialIndex = 0});
 
   @override
   State<ProviderShell> createState() => _ProviderShellState();
 }
 
 class _ProviderShellState extends State<ProviderShell> {
-  int _index = 0;
+  late int _index;
 
   static const _titles = [
     AppText.orders,
@@ -28,6 +29,7 @@ class _ProviderShellState extends State<ProviderShell> {
   @override
   void initState() {
     super.initState();
+    _index = widget.initialIndex;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         context.read<HandymanCubit>()

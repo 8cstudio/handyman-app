@@ -10,7 +10,12 @@ List<RouteBase> get customerRouteModule => [
       GoRoute(
         name: AppRoute.customerHome.name,
         path: AppRoute.customerHome.path,
-        builder: (context, state) => const CustomerHomeScreen(),
+        builder: (context, state) => CustomerHomeScreen(
+          initialTabIndex: AppRoute.tabIndexFromQuery(
+            state.uri.queryParameters['tab'],
+            isCustomer: true,
+          ),
+        ),
       ),
       GoRoute(
         name: AppRoute.customerServices.name,

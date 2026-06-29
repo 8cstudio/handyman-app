@@ -20,4 +20,6 @@ class NetworkConstants {
   static const String companyProvidersManage = '/company-providers-manage';
   static const String profileUpdate = '/profile-update';
   static const String profileProvider = '/profile-provider';
+  static const String pushRegisterToken = '/push-register-token';
+  static const String pushUnregisterToken = '/push-unregister-token';
 }

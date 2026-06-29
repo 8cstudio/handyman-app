@@ -14,7 +14,12 @@ List<RouteBase> get providerRouteModule => [
       GoRoute(
         name: AppRoute.providerHome.name,
         path: AppRoute.providerHome.path,
-        builder: (context, state) => const ProviderHomeScreen(),
+        builder: (context, state) => ProviderHomeScreen(
+          initialTabIndex: AppRoute.tabIndexFromQuery(
+            state.uri.queryParameters['tab'],
+            isCustomer: false,
+          ),
+        ),
       ),
       GoRoute(
         name: AppRoute.providerOnboarding.name,

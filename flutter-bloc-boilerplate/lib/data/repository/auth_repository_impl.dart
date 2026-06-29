@@ -1,3 +1,4 @@
+import 'package:my_bloc_app/core/firebase/push_notification_service.dart';
 import 'package:my_bloc_app/data/data_sources/local/auth_local_data_source.dart';
 import 'package:my_bloc_app/data/data_sources/remote/apis/auth/auth_api.dart';
 import 'package:my_bloc_app/data/local/local_cache_store.dart';
@@ -21,6 +22,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<UserEntity> signIn(SignInParams params) async {
     final user = await _authApi.signIn(params);
     await _localDataSource.saveUser(user);
+    await PushNotificationService.instance.syncTokenAfterAuth();
     return user;
   }
 
@@ -28,12 +30,14 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<UserEntity> signUp(SignUpParams params) async {
     final user = await _authApi.signUp(params);
     await _localDataSource.saveUser(user);
+    await PushNotificationService.instance.syncTokenAfterAuth();
     return user;
   }
 
   @override
   Future<void> signOut() async {
     try {
+      await PushNotificationService.instance.unregisterToken();
       await _authApi.signOut();
     } finally {
       await _localDataSource.clear();

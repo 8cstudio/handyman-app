@@ -350,4 +350,36 @@ class HandymanApiImpl implements HandymanApi {
       throw ApiException.fromDioError(e);
     }
   }
+
+  @override
+  Future<void> registerDeviceToken({
+    required String token,
+    required String platform,
+  }) async {
+    try {
+      await _dioClient.post(
+        NetworkConstants.pushRegisterToken,
+        data: {
+          'token': token,
+          'platform': platform,
+        },
+        options: Options(headers: _headers),
+      );
+    } on DioException catch (e) {
+      throw ApiException.fromDioError(e);
+    }
+  }
+
+  @override
+  Future<void> unregisterDeviceToken(String token) async {
+    try {
+      await _dioClient.delete(
+        NetworkConstants.pushUnregisterToken,
+        data: {'token': token},
+        options: Options(headers: _headers),
+      );
+    } on DioException catch (e) {
+      throw ApiException.fromDioError(e);
+    }
+  }
 }

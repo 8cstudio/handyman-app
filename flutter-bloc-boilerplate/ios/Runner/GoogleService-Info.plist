@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>138471737210-m8k174e2iu2d33b75dakv9dhonmhbnt3.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCyc52WNvBJMvtRK2hMqAHs_OW3l2uyeNU</string>
+	<key>GCM_SENDER_ID</key>
+	<string>138471737210</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.flutterBloc</string>
+	<key>PROJECT_ID</key>
+	<string>services-provider-b9462</string>
+	<key>STORAGE_BUCKET</key>
+	<string>services-provider-b9462.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:138471737210:ios:30c53370e1a44fadf1b8c3</string>
+	<key>DATABASE_URL</key>
+	<string>https://services-provider-b9462-default-rtdb.firebaseio.com</string>
+</dict>
+</plist>

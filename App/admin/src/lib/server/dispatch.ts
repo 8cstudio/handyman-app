@@ -9,6 +9,11 @@ import {
   requireRole,
 } from "./request-auth";
 import { getServiceClient } from "./supabase-admin";
+import {
+  formatBookingStatus,
+  getBookingParticipantUserIds,
+  notifyUsersAsync,
+} from "./push-notifications";
 
 export const PUBLIC_HANDLERS = new Set([
   "auth-sign-in",
@@ -677,6 +682,23 @@ async function handleBookingsAssign(request: NextRequest): Promise<NextResponse>
       isReassign ? "Provider re-assigned" : "Provider assigned"
     );
 
+    const { customerUserId, providerUserId } = await getBookingParticipantUserIds(
+      serviceClient,
+      booking_id
+    );
+    notifyUsersAsync(serviceClient, [customerUserId], {
+      title: "Provider assigned",
+      body: isReassign
+        ? "A new provider has been assigned to your booking."
+        : "A provider has been assigned to your booking.",
+      data: { type: "booking_status", booking_id, status: "assigned" },
+    });
+    notifyUsersAsync(serviceClient, [providerUserId], {
+      title: "New booking assigned",
+      body: "You have been assigned a new service booking.",
+      data: { type: "booking_status", booking_id, status: "assigned" },
+    });
+
     return apiJson({ booking: updated });
   } catch (e) {
     return apiError((e as Error).message, 500);
@@ -704,7 +726,7 @@ async function handleBookingsUpdateStatus(request: NextRequest): Promise<NextRes
 
     const { data: booking } = await serviceClient
       .from("bookings")
-      .select("*, providers(user_id)")
+      .select("*, customers(user_id), providers(user_id)")
       .eq("id", booking_id)
       .single();
 
@@ -749,6 +771,26 @@ async function handleBookingsUpdateStatus(request: NextRequest): Promise<NextRes
 
     if (status === "accepted") {
       await ensureChatRoom(booking_id);
+    }
+
+    const customerUserId = (booking.customers as { user_id?: string } | null)
+      ?.user_id;
+    const providerUserId = (booking.providers as { user_id?: string } | null)
+      ?.user_id;
+    const statusLabel = formatBookingStatus(status);
+
+    if (role === "provider") {
+      notifyUsersAsync(serviceClient, [customerUserId], {
+        title: "Booking update",
+        body: `Your provider updated the booking to ${statusLabel}.`,
+        data: { type: "booking_status", booking_id, status },
+      });
+    } else if (role === "company_admin" || role === "super_admin") {
+      notifyUsersAsync(serviceClient, [customerUserId, providerUserId], {
+        title: "Booking update",
+        body: `Booking status changed to ${statusLabel}.`,
+        data: { type: "booking_status", booking_id, status },
+      });
     }
 
     return apiJson({ booking: updated });
@@ -955,6 +997,25 @@ async function handleChatSendMessage(request: NextRequest): Promise<NextResponse
       .single();
 
     if (error) throw new Error(error.message);
+
+    const { customerUserId, providerUserId } = await getBookingParticipantUserIds(
+      serviceClient,
+      room.booking_id as string
+    );
+    const senderName =
+      ((message.profiles as { full_name?: string } | null)?.full_name?.trim()) ||
+      "Someone";
+    const recipientUserId =
+      auth.user.id === customerUserId ? providerUserId : customerUserId;
+
+    notifyUsersAsync(serviceClient, [recipientUserId], {
+      title: "New message",
+      body: `${senderName}: ${content.length > 120 ? `${content.slice(0, 117)}...` : content}`,
+      data: {
+        type: "chat",
+        booking_id: room.booking_id as string,
+      },
+    });
 
     return apiJson({ message }, 201);
   } catch (e) {
@@ -2185,6 +2246,77 @@ async function handleChatInbox(request: NextRequest): Promise<NextResponse> {
   }
 }
 
+async function handlePushRegisterToken(
+  request: NextRequest
+): Promise<NextResponse> {
+  if (request.method !== "POST") return apiError("Method not allowed", 405);
+
+  const authResult = await requireAuth(request);
+  if ("response" in authResult) return authResult.response;
+  const { auth } = authResult;
+
+  const roleResult = await withRole(auth, ["customer", "provider"]);
+  if ("response" in roleResult) return roleResult.response;
+
+  try {
+    const body = await parseBody(request);
+    const token = (body.token as string | undefined)?.trim();
+    const platform = (body.platform as string | undefined)?.trim();
+
+    if (!token) return apiError("token is required", 400);
+    if (!platform || !["ios", "android", "web"].includes(platform)) {
+      return apiError("platform must be ios, android, or web", 400);
+    }
+
+    const serviceClient = getServiceClient();
+    const { error } = await serviceClient.from("device_tokens").upsert(
+      {
+        user_id: auth.user.id,
+        token,
+        platform,
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "user_id,token" }
+    );
+
+    if (error) throw new Error(error.message);
+    return apiJson({ ok: true });
+  } catch (e) {
+    return apiError((e as Error).message, 500);
+  }
+}
+
+async function handlePushUnregisterToken(
+  request: NextRequest
+): Promise<NextResponse> {
+  if (request.method !== "DELETE") return apiError("Method not allowed", 405);
+
+  const authResult = await requireAuth(request);
+  if ("response" in authResult) return authResult.response;
+  const { auth } = authResult;
+
+  try {
+    const body = await parseBody(request);
+    const token = (body.token as string | undefined)?.trim();
+
+    const serviceClient = getServiceClient();
+    let query = serviceClient
+      .from("device_tokens")
+      .delete()
+      .eq("user_id", auth.user.id);
+
+    if (token) {
+      query = query.eq("token", token);
+    }
+
+    const { error } = await query;
+    if (error) throw new Error(error.message);
+    return apiJson({ ok: true });
+  } catch (e) {
+    return apiError((e as Error).message, 500);
+  }
+}
+
 const HANDLERS: Record<string, Handler> = {
   "auth-sign-in": handleAuthSignIn,
   "auth-register-customer": handleAuthRegisterCustomer,
@@ -2206,6 +2338,8 @@ const HANDLERS: Record<string, Handler> = {
   "catalog-categories": handleCatalogCategories,
   "profile-update": handleProfileUpdate,
   "profile-provider": handleProfileProvider,
+  "push-register-token": handlePushRegisterToken,
+  "push-unregister-token": handlePushUnregisterToken,
   "company-providers-manage": handleCompanyProvidersManage,
   "company-services-crud": handleCompanyServicesCrud,
   "company-categories-crud": handleCompanyCategoriesCrud,

@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_bloc_app/core/dio/exception/api_exception.dart';
+import 'package:my_bloc_app/core/firebase/push_notification_service.dart';
 import 'package:my_bloc_app/domain/usecases/auth/get_current_user_use_case.dart';
 import 'package:my_bloc_app/domain/usecases/auth/sign_in_use_case.dart';
 import 'package:my_bloc_app/domain/usecases/auth/sign_out_use_case.dart';
@@ -39,6 +40,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       final user = await _getCurrentUserUseCase();
       if (user != null) {
         emit(AuthAuthenticated(user));
+        await PushNotificationService.instance.syncTokenAfterAuth();
+        PushNotificationService.instance.handlePendingNotification();
       } else {
         emit(const AuthUnauthenticated());
       }
@@ -55,6 +58,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       final user = await _signInUseCase(event.params);
       emit(AuthAuthenticated(user));
+      PushNotificationService.instance.handlePendingNotification();
     } on ApiException catch (e) {
       emit(AuthFailure(e.message));
     } catch (e) {
@@ -70,6 +74,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       final user = await _signUpUseCase(event.params);
       emit(AuthAuthenticated(user));
+      PushNotificationService.instance.handlePendingNotification();
     } on ApiException catch (e) {
       emit(AuthFailure(e.message));
     } catch (e) {

@@ -62,4 +62,21 @@ enum AppRoute {
 
   bool get isPublicRoute => publicRoutes.contains(this);
   bool get isAuthRoute => authRoutes.contains(this);
+
+  static int tabIndexFromQuery(String? tab, {required bool isCustomer}) {
+    if (isCustomer) {
+      return switch (tab) {
+        'orders' => 1,
+        'chat' => 2,
+        'profile' => 3,
+        _ => 0,
+      };
+    }
+    return switch (tab) {
+      'orders' => 0,
+      'chat' => 1,
+      'profile' => 2,
+      _ => 0,
+    };
+  }
 }
