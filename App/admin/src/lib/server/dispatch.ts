@@ -775,8 +775,6 @@ async function handleBookingsUpdateStatus(request: NextRequest): Promise<NextRes
 
     const customerUserId = (booking.customers as { user_id?: string } | null)
       ?.user_id;
-    const providerUserId = (booking.providers as { user_id?: string } | null)
-      ?.user_id;
     const statusLabel = formatBookingStatus(status);
 
     if (role === "provider") {
